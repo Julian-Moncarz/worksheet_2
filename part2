@@ -1,0 +1,36 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Define a function called onedice that accepts no input, but returns a random integer from the list dicerolls = [1,2,3,4,5,6].
+
+def onedice ():
+	return(np.random.choice([1,2,3,4,5,6]))
+
+# Define another function called twodice that performs two dicerolls and returns their sum
+
+def twodice ():
+	return(onedice()+onedice())
+
+# Call the function twodice and populate the array twodice_data with 1000 elements.
+
+twodice_data = np.array([twodice() for i in range (1000)])
+
+# Write code to export the data to a text file. The best format would be to have each data point on a separate line.
+
+np.savetxt('twodice_data.txt', twodice_data, fmt='%d')
+
+# Compute the mean and standard deviation of your two dice data.
+
+mean = np.mean(twodice_data)
+std = np.std(twodice_data)
+print("mean =", mean,"std =", std) 
+
+# Plot the two dice data using a histogram. You can set bins = 'auto', or choose your own. Label both axes and give the plot a useful title.
+
+plt.hist(twodice_data, bins = 30, color = 'pink')
+plt.title("2d6 roll frequencies")
+plt.xlabel("Roll")
+plt.ylabel("Frequency")
+plt.show()
+
+# Based on your results from d) and e), what is the most common outcome for a two dice roll? What is the least common?

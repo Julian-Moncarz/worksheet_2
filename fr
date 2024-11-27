@@ -1,0 +1,73 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+
+def generate_polygon(center, radius, sides, rotation=0):
+    """
+    Generate vertices of a regular n-sided polygon.
+    
+    :param center: Center of the polygon (x, y)
+    :param radius: Radius of the polygon
+    :param sides: Number of sides
+    :param rotation: Rotation angle in radians
+    :return: Vertices of the polygon
+    """
+    angles = np.linspace(0, 2 * np.pi, sides, endpoint=False) + rotation
+    return np.array([center + radius * np.array([np.cos(a), np.sin(a)]) for a in angles])
+
+
+def koch_snowflake(order, sides):
+    """
+    Generate a Koch snowflake fractal where the cutouts are n-sided polygons.
+
+    :param order: Depth of recursion
+    :param sides: Number of sides for the base and cutout polygons
+    :return: Vertices of the snowflake fractal
+    """
+    # Base polygon (outer shape)
+    base_polygon = generate_polygon(center=np.array([0, 0]), radius=1, sides=sides)
+    base_polygon = np.vstack([base_polygon, base_polygon[0]])  # Close the polygon
+
+    def recursive_koch(polygon, depth):
+        """Recursively subdivide the polygon edges."""
+        if depth == 0:
+            return polygon
+
+        new_vertices = []
+        for i in range(len(polygon) - 1):
+            start, end = polygon[i], polygon[i + 1]
+            edge_vector = end - start
+            segment_length = np.linalg.norm(edge_vector) / 3
+
+            # First and last segments
+            p1 = start + edge_vector / 3
+            p2 = start + 2 * edge_vector / 3
+
+            # Scaled-down cutout polygon
+            center = p1 + (p2 - p1) / 2
+            rotation = np.arctan2(edge_vector[1], edge_vector[0])  # Angle of edge
+            cutout = generate_polygon(center, radius=segment_length, sides=sides, rotation=rotation + np.pi / sides)
+
+            # Append new points
+            new_vertices.extend([start, *cutout, p2])
+
+        new_vertices.append(polygon[-1])  # Close the shape
+        return recursive_koch(np.array(new_vertices), depth - 1)
+
+    # Generate fractal
+    fractal = recursive_koch(base_polygon, order)
+    return fractal[:, 0], fractal[:, 1]
+
+
+# Parameters
+order = 3  # Depth of recursion
+sides = 6  # Number of sides for base polygon and cutouts
+
+# Generate and plot the snowflake
+x, y = koch_snowflake(order, sides)
+plt.figure(figsize=(8, 8))
+plt.plot(x, y, color="blue", linewidth=1)
+plt.axis("equal")
+plt.title(f"Koch Snowflake (Order {order}, {sides}-sided Polygon Cutouts)")
+plt.show()
+

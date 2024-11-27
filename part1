@@ -1,0 +1,33 @@
+import numpy as np
+
+#Q1 Create a function that accepts a list object of any size and returns the average of all the list elements.
+
+def avrg(list):
+	return(np.mean(list))
+
+#Q2 Create a function that accepts two numbers, x and y, and returns a two-element list containing x-y and x+y.
+
+def q2 (x,y):
+	return([x-y, x+y])
+
+#Q3 Create a function that accepts a list of any size and prints every tenth element.
+
+def tenth_nums (list):
+	for i in range(9, len(list), 10):
+		print(list[i])
+
+#Q4 Create a function that accepts a list object containing integers, floats, strings, and booleans, and returns a list containing the total number of elements for each data type.
+
+def type_counts (list):
+	type_counts = {"int":0, "float":0, "str":0, "bool":0}
+	for i in list:
+		if type(i) == int:
+			type_counts["int"] += 1
+		elif type(i) == float:
+			type_counts["float"] += 1
+		elif type(i) == str:
+			type_counts["str"] += 1
+		elif type(i) == bool:
+                        type_counts["bool"] += 1
+	return(type_counts)
+
