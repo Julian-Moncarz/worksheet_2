@@ -1,0 +1,94 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+def snowflake(order, sides , length=1):
+    """
+    Generate the vertices of a snowflake.
+
+    :param order: The order of the Koch snowflake.
+    :param sides: The number of sides in the polygons.
+    :param length: The length of each side of the initial polygon.
+    :return: Numpy array of (x, y) points representing the Koch snowflake.
+    """
+    # Define the initial polygon
+    angles = np.linspace(0, 2 * np.pi, sides+1)
+    points = np.array([[np.cos(a), np.sin(a)] for a in angles]) * (length / (2 * np.sin(np.pi / sides)))
+
+    def koch_iteration(points, times):
+      """
+      Perform one iteration of the Koch rule on the given points.
+      :param points: Array of (x, y) points.
+      :param times: Number of times the iteration has run.
+      :return: New array of (x, y) points after applying the Koch rule.
+      """
+      new_points = []
+      for i in range(len(points) - 1):
+          p1 = points[i]
+          p2 = points[i + 1]
+
+          # Divide the segment into three equal parts
+          pA = p1 + (p2 - p1) / 3
+          pB = p1 + 2 * (p2 - p1) / 3
+
+          # Find the vector and length between pA and pB
+          pApB = pB - pA
+          length_pApB = np.sqrt(pApB[0]**2 + pApB[1]**2)
+
+          # Find the midpoint of line pApB
+          pM = pA + (pApB) / 2
+
+          # Find the unit vector perpendicular to line pApB
+          perpendicular_unit_v = np.array([-pApB[1], pApB[0]]) / length_pApB
+
+          # Find the distance from point pM to the center
+          distance_from_pM_to_center = length_pApB / (2 * np.tan(np.pi / sides))
+
+          # Find the center
+          if times >= 1:
+            center = pM - perpendicular_unit_v * distance_from_pM_to_center
+          else: center = pM + perpendicular_unit_v * distance_from_pM_to_center
+
+          # Compute the radius of the polygon
+          radius = length_pApB / (2 * np.sin(np.pi / sides))
+
+          # Generate the polygon vertices around the center
+          vertexes = (np.array([[np.cos(a), np.sin(a)] for a in np.linspace(0, 2 * np.pi, sides+1)]) * radius) + center
+          # Only works for n > 3  
+
+
+          # Append the new points
+          new_points.append(p1)
+          new_points.append(pA)
+          new_points.extend(vertexes)
+          new_points.append(pB)
+
+      new_points.append(points[-1])  # Add the last point
+      return np.array(new_points)
+
+
+    # Apply the Koch iterations
+    for _ in range(order):
+        print(_)
+        points = koch_iteration(points, _)
+
+    return points
+
+# Parameters for the snowflake
+order = 1  # Fractal order
+length = 1.0  # Length of the initial polygon's sides
+sides = 6 # Number of sides of polygon
+
+# Generate the fractal
+points = snowflake(order, sides, length)
+
+# Plot the Koch snowflake
+x, y = points[:, 0], points[:, 1]  # Explicit x and y
+plt.scatter(x,y)
+plt.show()
+
+
+plt.figure(figsize=(8, 8))
+plt.plot(points[:, 0], points[:, 1], 'b-')
+plt.axis('equal')
+plt.title(f"Snowflake (Order {order})")
+plt.show()
